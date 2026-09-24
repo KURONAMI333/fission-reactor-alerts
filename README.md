@@ -3,7 +3,8 @@
 > Server-side early warning for Mekanism fission reactors: when a formed reactor starts taking damage, the claiming team receives one chat alert; without a claim, nearby players receive it. Never touches reactor state.
 
 [![License: All Rights Reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg)](LICENSE)
-This is a local v0.1 prototype. No download page has been published yet.
+Homepage (intended CurseForge page, not yet published): https://www.curseforge.com/minecraft/mc-mods/fission-reactor-alerts
+Bugs and questions: comment on the CurseForge page, or DM @kuronami333 on X (https://x.com/kuronami333).
 
 ---
 
