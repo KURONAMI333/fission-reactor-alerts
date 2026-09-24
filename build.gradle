@@ -1,0 +1,177 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'idea'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = mod_version
+group = mod_group_id
+
+// headless 検証専用の source set。`jar` は sourceSets.main だけを詰めるので、
+// ここに置いたテストクラスと構造テンプレ NBT は出荷 jar に入らない。
+sourceSets {
+    gametest {
+        // Host-mod APIs (Mekanism, FTB) live in compileOnly/runtimeOnly — carry
+        // them onto the gametest classpath so the headless tests can reference
+        // the real reactor classes.
+        compileClasspath += sourceSets.main.output + configurations.compileClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
+    }
+}
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        // Manual verification: server + client. gameDirectory is kept separate
+        // so logs and worlds from this mod never mix with other sessions.
+        client {
+            client()
+            gameDirectory = file('run/client')
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            gameDirectory = file('run/server')
+        }
+
+        // headless の挙動検証。GUI は開かない。gameDirectory は専用に分けて
+        // 手動セッションが残したワールドデータを引き継がないようにする。
+        // run/gametest/mods への追加 jar 配置は不要（runtimeOnly 依存が解決する）。
+        gameTestServer {
+            type = 'gameTestServer'
+            gameDirectory = file('run/gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            sourceSet = sourceSets.gametest
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            // GameTest の登録スキャンは mod のファイル一覧を見るので、検証用 source set も
+            // 同じ mod に属させる。jar の中身には影響しない。
+            sourceSet(sourceSets.gametest)
+        }
+    }
+
+    addModdingDependenciesTo(sourceSets.gametest)
+    addModdingDependenciesTo(sourceSets.test)
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+repositories {
+    // Mekanism main + Generators: modmaven only carries the main module for
+    // 1.21.1, so both come from CurseMaven as the exact published file pair.
+    maven {
+        url = "https://www.cursemaven.com"
+        content { includeGroup "curse.maven" }
+    }
+    maven { url = 'https://maven.ftb.dev/releases' }
+    maven { url = 'https://maven.architectury.dev/' }
+}
+
+dependencies {
+    // Mekanism (required host) — main module + Generators module.
+    compileOnly "curse.maven:mekanism-268560:${mekanism_file}"
+    compileOnly "curse.maven:mekanism-generators-268566:${mekanism_generators_file}"
+    runtimeOnly  "curse.maven:mekanism-268560:${mekanism_file}"
+    runtimeOnly  "curse.maven:mekanism-generators-268566:${mekanism_generators_file}"
+
+    // FTB Chunks + Teams (optional team-delivery path) + FTB Library for
+    // ChunkDimPos. runtimeOnly so the dev client/server can exercise the real
+    // claim path; without them the mod compiles and falls back to proximity.
+    compileOnly "dev.ftb.mods:ftb-chunks-neoforge:${ftb_chunks_version}"
+    compileOnly "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
+    compileOnly "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+    // -PwithoutFtb exercises the documented optional-dependency fallback in
+    // runGameTestServer without changing the published jar or dependency spec.
+    if (!project.hasProperty('withoutFtb')) {
+        runtimeOnly "dev.ftb.mods:ftb-chunks-neoforge:${ftb_chunks_version}"
+        runtimeOnly "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
+        runtimeOnly "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+    }
+
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+// 検証コードの腐りをビルドで拾う（実行はしない。実行は runGameTestServer）。
+tasks.named('check') {
+    dependsOn tasks.named('compileGametestJava')
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_description        : mod_description,
+            mod_authors            : mod_authors,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/repo"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}

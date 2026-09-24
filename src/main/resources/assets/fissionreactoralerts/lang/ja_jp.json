@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[原子炉警報] %s（%s）の核分裂炉が損傷を受け始めました！ 損傷 %s%%、温度 %s K — 炉の統計タブを確認してください。",
+  "message.fissionreactoralerts.damage_team": "[原子炉警報] %s（%s）の核分裂炉が損傷を受け始めました！ 損傷 %s%%、温度 %s K — 炉の統計タブを確認してください。（チーム: %s）"
+}

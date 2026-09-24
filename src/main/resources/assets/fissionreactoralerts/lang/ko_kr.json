@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[원자로 경보] %s (%s)의 핵분열 원자로가 손상되고 있습니다! 손상 %s%%, 온도 %s K — 원자로의 통계 탭을 확인하세요.",
+  "message.fissionreactoralerts.damage_team": "[원자로 경보] %s (%s)의 핵분열 원자로가 손상되고 있습니다! 손상 %s%%, 온도 %s K — 원자로의 통계 탭을 확인하세요. (팀: %s)"
+}

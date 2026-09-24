@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[Spaltreaktor-Alarm] Der Fissionsreaktor bei %s (%s) nimmt Schaden! Schaden %s%%, Temperatur %s K — prüfe den Statistik-Tab des Reaktors.",
+  "message.fissionreactoralerts.damage_team": "[Spaltreaktor-Alarm] Der Fissionsreaktor bei %s (%s) nimmt Schaden! Schaden %s%%, Temperatur %s K — prüfe den Statistik-Tab des Reaktors. (Team: %s)"
+}

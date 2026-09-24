@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[裂变反应堆警报] 位于 %s（%s）的裂变反应堆正在受损！损伤 %s%%，温度 %s K——请查看反应堆的统计标签页。",
+  "message.fissionreactoralerts.damage_team": "[裂变反应堆警报] 位于 %s（%s）的裂变反应堆正在受损！损伤 %s%%，温度 %s K——请查看反应堆的统计标签页。（团队：%s）"
+}

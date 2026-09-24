@@ -1,0 +1,68 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://x.com/kuronami333"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/fission-reactor-alerts"
+description='''
+${mod_description}
+'''
+
+[[mixins]]
+config="fissionreactoralerts.mixins.json"
+
+# NOTE: versionRange uses neo_version, NOT loader_version_range
+# (composing the loader range here yields an unparseable range and
+# silently breaks the mod — lesson carried from Free Server Saver).
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# The whole mod is a Mekanism Generators add-on: without the fission reactor
+# there is nothing to watch. Required so the mixin target always exists and
+# NeoForge reports a clear dependency error instead of a mixin failure.
+[[dependencies.${mod_id}]]
+    modId="mekanism"
+    type="required"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="mekanismgenerators"
+    type="required"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Team delivery is optional: with FTB Chunks + FTB Teams installed the alert
+# goes to the online members of the team(s) claiming the reactor's chunks.
+# Without them the mod falls back to players standing near the reactor.
+[[dependencies.${mod_id}]]
+    modId="ftbchunks"
+    type="optional"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="ftbteams"
+    type="optional"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="BOTH"
