@@ -44,6 +44,18 @@ neoForge {
         client {
             client()
             gameDirectory = file('run/client')
+
+            // dev 用の任意 JVM / program 引数（空白区切り・実機受入計測用）。
+            // 例: -PextraJvmArgs="-Dfra.clientprobe=true -Dfml.queryResult=confirm"
+            //     -PextraProgramArgs="--quickPlaySingleplayer selftest"
+            if (providers.gradleProperty('extraJvmArgs').isPresent()) {
+                providers.gradleProperty('extraJvmArgs').get()
+                    .split(/\s+/).each { jvmArguments.add(it) }
+            }
+            if (providers.gradleProperty('extraProgramArgs').isPresent()) {
+                providers.gradleProperty('extraProgramArgs').get()
+                    .split(/\s+/).each { programArguments.add(it) }
+            }
         }
 
         server {
