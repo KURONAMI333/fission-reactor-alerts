@@ -18,7 +18,7 @@ Mekanism's fission reactor can run away while nobody is watching: a redstone gli
 **Dependencies**
 
 - [Mekanism](https://www.curseforge.com/minecraft/mc-mods/mekanism) + [Mekanism Generators](https://www.curseforge.com/minecraft/mc-mods/mekanism-generators) — required; this is an addon for their fission reactor
-- [FTB Chunks](https://www.curseforge.com/minecraft/mc-mods/ftb-chunks-forge) + [FTB Teams](https://www.curseforge.com/minecraft/mc-mods/ftb-teams) — optional. With both installed, alerts route to the claiming team; without them the proximity fallback covers every reactor
+- [FTB Chunks](https://www.curseforge.com/minecraft/mc-mods/ftb-chunks) + [FTB Teams](https://www.curseforge.com/minecraft/mc-mods/ftb-teams) — optional. With both installed, alerts route to the claiming team; without them the proximity fallback covers every reactor
 - The two FTB mods are CurseForge-only, so a Modrinth-only setup cannot resolve them — the mod works without them regardless
 
 **Scope and limitations**
