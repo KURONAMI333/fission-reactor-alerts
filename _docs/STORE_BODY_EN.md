@@ -31,4 +31,6 @@ Mekanism's fission reactor can run away while nobody is watching: a redstone gli
 
 Bugs and questions: comment on the CurseForge page, or DM @kuronami333 on X.
 
+The mod icon adapts Mekanism Generators' `fission_reactor_port_input` block texture (MIT license). See NOTICE.md in the source repository for attribution and third-party terms.
+
 All Rights Reserved. Free to put in any modpack, on any platform, monetised or not - no permission needed, no credit required. Source: https://github.com/KURONAMI333/fission-reactor-alerts

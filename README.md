@@ -44,3 +44,4 @@ This mod watches every formed fission reactor on the server for you. The moment 
 ## Credits
 
 - Author: KURONAMI
+- The mod icon adapts Mekanism Generators' `fission_reactor_port_input` block texture. See [NOTICE.md](NOTICE.md) for attribution and third-party terms.
