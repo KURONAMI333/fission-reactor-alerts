@@ -52,6 +52,13 @@ libs-local/
 branding/_ref/
 branding/_cobblemon_assets/
 
+### Branding production (only approved final assets are tracked) ###
+/branding/icon-candidates/
+/branding/render_fission_reactor_alerts_icons*.py
+/branding/render_fission_reactor_alerts_subjects.py
+/branding/DECISION.md
+/branding/__pycache__/
+
 ### Logs ###
 # gradle / dev client のログは C:\Users\<name>\ の絶対パスを含む
 logs/
