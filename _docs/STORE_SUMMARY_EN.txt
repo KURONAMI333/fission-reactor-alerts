@@ -1,1 +1,1 @@
-One chat alert the instant a Mekanism fission reactor starts taking damage — sent to its claiming team, or players nearby.
+Sends one chat alert the instant a Mekanism fission reactor starts taking damage — routed to its claiming team.
