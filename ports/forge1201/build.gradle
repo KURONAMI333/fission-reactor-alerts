@@ -1,0 +1,130 @@
+plugins {
+    id 'java-library'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.2.0.7-dev-SNAPSHOT'
+}
+
+version = mod_version
+group = mod_group_id
+
+def withoutFtb = project.hasProperty('withoutFtb')
+def fissionGameTestMode = withoutFtb ? 'without-ftb' : 'full'
+base { archivesName = "${mod_id}-forge-1.20.1" }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output + configurations.compileClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
+    }
+}
+
+minecraft {
+    mappings channel: 'parchment', version: "${parchment_mappings_version}-${minecraft_version}"
+    runs {
+        client {
+            workingDirectory project.file('run/client')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'info'
+            mods { "${mod_id}" { source sourceSets.main; source sourceSets.gametest } }
+        }
+        server {
+            workingDirectory project.file('run/server')
+            property 'forge.logging.console.level', 'info'
+            args '--nogui'
+            mods { "${mod_id}" { source sourceSets.main; source sourceSets.gametest } }
+        }
+        gameTestServer {
+            workingDirectory project.file('run/gametest')
+            property 'forge.logging.console.level', 'info'
+            property 'forge.enabledGameTestNamespaces', mod_id
+            property 'fissionreactoralerts.gametest.mode', fissionGameTestMode
+            mods { "${mod_id}" { source sourceSets.main; source sourceSets.gametest } }
+        }
+    }
+}
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://www.cursemaven.com' }
+    maven { url = 'https://maven.ftb.dev/releases' }
+    maven { url = 'https://maven.minecraftforge.net' }
+    maven { url = 'https://maven.parchmentmc.org' }
+    maven { url = 'https://maven.architectury.dev/' }
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly fg.deobf("curse.maven:mekanism-268560:${mekanism_core_file}")
+    compileOnly fg.deobf("curse.maven:mekanism-generators-268566:${mekanism_generators_file}")
+    runtimeOnly fg.deobf("curse.maven:mekanism-268560:${mekanism_core_file}")
+    runtimeOnly fg.deobf("curse.maven:mekanism-generators-268566:${mekanism_generators_file}")
+
+    // Optional FTB bridge: compile against Forge 1.20.1 API, include in the
+    // dev run by default, and prove the proximity fallback with -PwithoutFtb.
+    compileOnly fg.deobf("dev.ftb.mods:ftb-chunks-forge:${ftb_chunks_version}")
+    compileOnly fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
+    compileOnly fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
+    // LegacyForge mod* configurations are deliberately non-transitive. FTB's published Forge metadata requires Architectury.
+    compileOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+    if (!withoutFtb) {
+        runtimeOnly fg.deobf("dev.ftb.mods:ftb-chunks-forge:${ftb_chunks_version}")
+        runtimeOnly fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
+        runtimeOnly fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
+        runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+    }
+
+    compileOnly 'org.spongepowered:mixin:0.8.5'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def mixinRefmapDir = layout.buildDirectory.dir('generated/mixin')
+def mixinRefmapFile = mixinRefmapDir.map { it.file('fissionreactoralerts.refmap.json') }
+sourceSets.main.resources.srcDir(mixinRefmapDir)
+tasks.named('compileJava', JavaCompile) {
+    doFirst { mixinRefmapDir.get().asFile.mkdirs() }
+    options.compilerArgs.add("-AoutRefMapFile=${mixinRefmapFile.get().asFile.absolutePath}")
+    outputs.file(mixinRefmapFile)
+}
+tasks.named('processResources') {
+    dependsOn tasks.named('compileJava')
+}
+
+tasks.named('test', Test) { useJUnitPlatform() }
+tasks.named('check') { dependsOn tasks.named('compileGametestJava') }
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var props = [minecraft_version: minecraft_version,
+                 minecraft_version_range: minecraft_version_range,
+                 forge_version: forge_version,
+                 loader_version_range: loader_version_range,
+                 mod_id: mod_id,
+                 mod_name: mod_name,
+                 mod_license: mod_license,
+                 mod_version: mod_version,
+                 mod_description: mod_description,
+                 mod_authors: mod_authors]
+    inputs.properties props
+    expand props
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+
+jar {
+    manifest.attributes(['MixinConfigs': 'fissionreactoralerts.mixins.json'])
+    inputs.file(file('LICENSE'))
+    from('LICENSE') { rename { "LICENSE_${mod_id}" } }
+    from('NOTICE.md')
+}
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

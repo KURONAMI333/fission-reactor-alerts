@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[Alerte réacteur] Le réacteur à fission en %s (%s) subit des dégâts ! Dégâts %s%%, température %s K — consultez l'onglet Statistiques du réacteur.",
+  "message.fissionreactoralerts.damage_team": "[Alerte réacteur] Le réacteur à fission en %s (%s) subit des dégâts ! Dégâts %s%%, température %s K — consultez l'onglet Statistiques du réacteur. (Équipe : %s)"
+}

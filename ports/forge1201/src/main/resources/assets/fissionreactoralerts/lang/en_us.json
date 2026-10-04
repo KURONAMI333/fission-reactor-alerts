@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[Fission Reactor Alert] Fission reactor at %s (%s) is taking damage! Damage %s%%, temperature %s K — check the reactor's Statistics tab.",
+  "message.fissionreactoralerts.damage_team": "[Fission Reactor Alert] Fission reactor at %s (%s) is taking damage! Damage %s%%, temperature %s K — check the reactor's Statistics tab. (Team: %s)"
+}

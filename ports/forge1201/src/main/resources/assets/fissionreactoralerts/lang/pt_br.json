@@ -1,0 +1,4 @@
+{
+  "message.fissionreactoralerts.damage": "[Alerta de reator] O reator de fissão em %s (%s) está sofrendo dano! Dano %s%%, temperatura %s K — verifique a aba de estatísticas do reator.",
+  "message.fissionreactoralerts.damage_team": "[Alerta de reator] O reator de fissão em %s (%s) está sofrendo dano! Dano %s%%, temperatura %s K — verifique a aba de estatísticas do reator. (Equipe: %s)"
+}
